@@ -1,0 +1,12 @@
+var number: float = 200
+var number2: float = 400
+var number3: float = number + number2
+
+number3 += 20;
+number3 << 9;
+
+if (number3 > 230)
+  echo "number3 is greater than 230"
+endif
+
+echo number3
