@@ -25,7 +25,7 @@ int main(const int argc, const char** argv)
   Cmdline_t* cmd = (Cmdline_t*) malloc(sizeof(Cmdline_t));
   if (MakeCmdline(cmd, argc, argv)) goto ERR;
   if (check_version_or_help(cmd)) goto fini;
-  if (callq_mode(cmd) == 0) goto ERR;
+  if (!callq_mode(cmd)) goto ERR;
 
 fini:
   free(cmd);

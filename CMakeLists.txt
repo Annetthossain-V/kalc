@@ -12,6 +12,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
   $<$<CONFIG:Release>: -O3 -march=x86-64-v2 -mtune=native -fno-plt -fstack-protector -Wall -Wextra -flto>
   $<$<CONFIG:Debug>: -O0 -g>
   -I${CMAKE_CURRENT_SOURCE_DIR}/src/
+  -pthread
 )
 
 target_link_options(${PROJECT_NAME} PRIVATE
