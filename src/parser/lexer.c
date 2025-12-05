@@ -48,7 +48,7 @@ static char** split_by_delims(const char* buff, const char* delims, size_t* coun
         inq = false;
         p++;
       }
-      else 
+      else
       {
         p++;
       }
@@ -100,7 +100,7 @@ static char** split_by_delims(const char* buff, const char* delims, size_t* coun
       TokenStart = p;
     p++;
   }
- 
+
   if (TokenStart)
   {
     char* tok = sdub(TokenStart, p - TokenStart);
@@ -115,8 +115,13 @@ static char** split_by_delims(const char* buff, const char* delims, size_t* coun
 lexer_t** LexStr(const char* buff, size_t* len)
 {
   const char* delims = "{}[]()<>!@#$%^&*:;'-+/.,|";
-  
+  size_t TokensLen = 0;
+  char** tokens = split_by_delims(buff, delims, &TokensLen);
 
+
+
+  for (size_t i = 0; i < TokensLen; ++i) free(tokens[i]);
+  free(tokens);
   return (void*)0;
 }
 
