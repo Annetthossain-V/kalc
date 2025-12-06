@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <runtime/defc.h>
 
 static inline void add_single_arg(Cmdline_t* cmd, const char** argv, const CmdlineOpts_t opt)
 {
@@ -16,12 +17,12 @@ static inline int add_double_arg(Cmdline_t* cmd, const char** argv, int* i, cons
   *i = *i + 1;
   if (*i >= argc)
   {
-    fprintf(stderr, "[ERR] Missing argument for `%s`\n", argv[*i - 1]);
+    lerror("Missing argument for `%s`", argv[*i - 1]);
     return 1;
   }
   if (strlen(argv[*i]) >= OPTS_STR_LIMIT)
   {
-    fprintf(stderr, "[ERR] Argument too large! Per argument max is %d chars.\n", OPTS_STR_LIMIT);
+    lerror("Argument too large! Per argument max is %d chars", OPTS_STR_LIMIT);
     return 1;
   }
 
@@ -51,7 +52,7 @@ int MakeCmdline(Cmdline_t *cmd, const int argc, const char** argv)
       else if (strcmp(argv[i], "--define") == 0) { if (add_double_arg(cmd, argv, &i, argc, Define)) return 1; }
       else
       {
-        fprintf(stderr, "[ERR] Undefined arg `%s`\n", argv[i]);
+        lerror("Undefined arg `%s`", argv[i]);
         return 1;
       }
     }
@@ -66,9 +67,9 @@ int MakeCmdline(Cmdline_t *cmd, const int argc, const char** argv)
 
   return 0;
 TOO_MANY_ARGS:
-  fprintf(stderr, "[ERR] Too many command line arguments! max limit reached.\n");
+  lerror("Too many command line arguments! max limit reached");
   return 1;
 ARG_TOO_LARGE:
-  fprintf(stderr, "[ERR] Argument too large! Per argument max is %d chars.\n", PER_FILE_LIMIT);
+  lerror("Argument too large! Per argument max is %d chars", PER_FILE_LIMIT);
   return 1;
 }

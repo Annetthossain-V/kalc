@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <parser/lexer.h>
+#include <runtime/defc.h>
 
 static int buff_handler(const char* buff)
 {
@@ -24,7 +25,7 @@ int FileMode(Cmdline_t* cmd)
     FILE* file = fopen(cmd->Files[i], "r");
     if (file == NULL)
     {
-      fprintf(stderr, "[ERR] Unable to open file `%s`\n", cmd->Files[i]);
+      lerror("Unable to open file `%s`", cmd->Files[i]);
       free(buff);
       return 0;
     }

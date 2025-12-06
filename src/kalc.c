@@ -1,7 +1,9 @@
+#include <runtime/defc.h>
 #include <stdlib.h>
 #include <cmdline.h>
 #include <stdio.h>
 #include <mode.h>
+
 
 #define VERSION 0.1
 
@@ -9,7 +11,7 @@ static inline int check_version_or_help(Cmdline_t* cmd)
 {
   if (CmdlineContainsSingle(cmd, Version))
   {
-    printf("Version %.2f", VERSION);
+    linfo("Version %.2f", VERSION);
     return 1;
   }
   else if (CmdlineContainsSingle(cmd, Help))
@@ -22,6 +24,8 @@ static inline int check_version_or_help(Cmdline_t* cmd)
 
 int main(const int argc, const char** argv)
 {
+  SetFileLog(stdout); // make this dynamic
+
   Cmdline_t* cmd = (Cmdline_t*) malloc(sizeof(Cmdline_t));
   if (MakeCmdline(cmd, argc, argv)) goto ERR;
   if (check_version_or_help(cmd)) goto fini;

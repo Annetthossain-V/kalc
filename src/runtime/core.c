@@ -1,5 +1,8 @@
 #include <runtime/core.h>
 #include <pthread.h>
+#include <stdio.h>
+
+FILE* file_log = NULL;
 
 static pthread_mutex_t VariableMutex;
 
