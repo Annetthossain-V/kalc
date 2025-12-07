@@ -23,7 +23,7 @@ static inline int add_double_arg(Cmdline_t* cmd, const char** argv, int* i, cons
   if (strlen(argv[*i]) >= OPTS_STR_LIMIT)
   {
     lerror("Argument too large! Per argument max is %d chars", OPTS_STR_LIMIT);
-    return 1;
+    return RET_ERR;
   }
 
   cmd->Opts[cmd->OptsLen].Opt = opt;
@@ -31,7 +31,7 @@ static inline int add_double_arg(Cmdline_t* cmd, const char** argv, int* i, cons
   strcpy(cmd->Opts[cmd->OptsLen].OptsStr, argv[*i]);
   ++cmd->OptsLen;
 
-  return 0;
+  return RET_OK;
 }
 
 int MakeCmdline(Cmdline_t *cmd, const int argc, const char** argv)
@@ -53,7 +53,7 @@ int MakeCmdline(Cmdline_t *cmd, const int argc, const char** argv)
       else
       {
         lerror("Undefined arg `%s`", argv[i]);
-        return 1;
+        return RET_ERR;
       }
     }
     else
@@ -65,11 +65,11 @@ int MakeCmdline(Cmdline_t *cmd, const int argc, const char** argv)
     }
   }
 
-  return 0;
+  return RET_OK;
 TOO_MANY_ARGS:
   lerror("Too many command line arguments! max limit reached");
-  return 1;
+  return RET_ERR;
 ARG_TOO_LARGE:
   lerror("Argument too large! Per argument max is %d chars", PER_FILE_LIMIT);
-  return 1;
+  return RET_ERR;
 }

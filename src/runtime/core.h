@@ -8,3 +8,6 @@ int __fini_global(void);
 
 void VariableMutexLock(void);
 void VariableMutexUnlock(void);
+
+void CodeBufferLock(void);
+void CodeBufferUnlock(void);

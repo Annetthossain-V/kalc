@@ -11,10 +11,10 @@ static int buff_handler(const char* buff)
 {
   size_t lexer_len = 0;
   lexer_t** lexer = LexStr(buff, &lexer_len);
-  if (lexer == NULL) return 1;
+  if (lexer == NULL) return RET_ERR;
 
   LexFree(lexer, lexer_len);
-  return 0;
+  return RET_OK;
 }
 
 int FileMode(Cmdline_t* cmd)
@@ -27,7 +27,7 @@ int FileMode(Cmdline_t* cmd)
     {
       lerror("Unable to open file `%s`", cmd->Files[i]);
       free(buff);
-      return 0;
+      return RET_ERR;
     }
 
     while (fgets(buff, 1024, file))
@@ -39,11 +39,11 @@ int FileMode(Cmdline_t* cmd)
         goto fini;
       }
 
-      if (buff_handler(buff) != 0)
+      if (buff_handler(buff) != RET_OK)
       {
         free(buff);
         fclose(file);
-        return 0;
+        return RET_ERR;
       }
     }
 
@@ -52,7 +52,7 @@ int FileMode(Cmdline_t* cmd)
 
 fini:
   free(buff);
-  return 1;
+  return RET_OK;
 }
 
 int StdinMode(Cmdline_t* cmd)
@@ -67,13 +67,13 @@ int StdinMode(Cmdline_t* cmd)
     buff[strlen(buff) - 1] = '\0';
     if (strcmp(buff, "exit") == 0) break;
 
-    if (buff_handler(buff) != 0)
+    if (buff_handler(buff) != RET_OK)
     {
       free(buff);
-      return 0;
+      return RET_ERR;
     }
   }
 
   free(buff);
-  return 1;
+  return RET_OK;
 }
