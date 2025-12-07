@@ -1,128 +1,132 @@
 #include <parser/lexer.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <parser/split.h>
 
-static inline char* sdub(const char* s, size_t n)
+const char* delims = "{}[]()<>!@#$%^&*:;'-+/.,";
+
+// str is expected to only 1 char long
+static inline lexerIdm_t get_lexer_idm(const char* str)
 {
-  char* r = (char*) malloc(n + 1);
-  memcpy(r, s, n);
-  r[n] = '\0';
-  return r;
+  if (strlen(str) > 1) abort();
+  switch (str[0])
+  {
+    case '{':
+      return LexIdCurlyBracketOpen;
+    case '}':
+      return LexIdCurlyBracketClose;
+    case '[':
+      return LexIdSquareBracketOpen;
+    case ']':
+      return LexIdSquareBracketClose;
+    case '(':
+      return LexIdBracketOpen;
+    case ')':
+      return LexIdBracketClose;
+    case '<':
+      return LexIdLessThan;
+    case '>':
+      return LexIdGreaterThan;
+    case '!':
+      return LexIdExclamation;
+    case '@':
+      return LexIdAddSym;
+    case '#':
+      return LexIdHash;
+    case '$':
+      return LexIdDollar;
+    case '%':
+      return LexIdPercent;
+    case '^':
+      return LexIdPowHat;
+    case '&':
+      return LexIdAnd;
+    case '*':
+      return LexIdAsterisk;
+    case ':':
+      return LexIdColon;
+    case ';':
+      return LexIdSemiColon;
+    case '\'':
+      return LexIdQuote;
+    case '-':
+      return LexIdMinus;
+    case '+':
+      return LexIdPlus;
+    case '/':
+      return LexIdSlash;
+    case '.':
+      return LexIdDot;
+    case ',':
+      return LexIdComma;
+    case '|':
+      return LexIdPipe;
+  }
+  __builtin_unreachable();
 }
 
-// not handeling errors for performance
-static char** split_by_delims(const char* buff, const char* delims, size_t* count)
+static inline lexerId_t get_lexer_id(const char* str)
 {
-  if (!buff) return NULL;
-
-  size_t cap = 16;
-  size_t _count = 0;
-  char** tokens = (char**) malloc(cap * sizeof(char*));
-  if (!tokens) return NULL;
-
-  const char* p = buff;
-  const char* TokenStart = NULL;
-  bool inq = false;
-
-  #define PUSH_TOKEN(tok) do { \
-    if (_count + 2 >= cap) { \
-      cap += 16; \
-      char** tmp = realloc(tokens, cap * sizeof(char*)); \
-      tokens = tmp; } \
-      tokens[_count++] = (tok); } \
-      while (0)
-
-  while (*p)
+  if (strlen(str) == 1 && strchr(delims, str[0]))
   {
-    unsigned char c = (unsigned char)*p;
-    if (inq)
-    {
-      if (c == '"')
-      {
-        char* tok = sdub(TokenStart, p - TokenStart);
-        PUSH_TOKEN(tok);
-        TokenStart = NULL;
-        inq = false;
-        p++;
-      }
-      else
-      {
-        p++;
-      }
-      continue;
-    }
-
-    if (c == '"')
-    {
-      if (TokenStart)
-      {
-        char* tok = sdub(TokenStart, p - TokenStart);
-        PUSH_TOKEN(tok);
-        TokenStart = NULL;
-      }
-      inq = true;
-      TokenStart = ++p;
-      continue;
-    }
-
-    if (isspace(c))
-    {
-      if (TokenStart)
-      {
-        char* tok = sdub(TokenStart, p - TokenStart);
-        PUSH_TOKEN(tok);
-        TokenStart = NULL;
-      }
-      p++;
-      continue;
-    }
-
-    if (strchr(delims, c))
-    {
-      if (TokenStart)
-      {
-        char* tok = sdub(TokenStart, p - TokenStart);
-        PUSH_TOKEN(tok);
-        TokenStart = NULL;
-      }
-
-      char dstr[2] = { *p, '\0'};
-      char* delcopy = strdup(dstr);
-      PUSH_TOKEN(delcopy);
-      p++;
-      continue;
-    }
-
-    if (!TokenStart)
-      TokenStart = p;
-    p++;
+    return LexTok;
   }
 
-  if (TokenStart)
+  bool is_number = true;
+  for (unsigned long i = 0; i < strlen(str); ++i)
   {
-    char* tok = sdub(TokenStart, p - TokenStart);
-    PUSH_TOKEN(tok);
+    switch (str[i])
+    {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case 'x': // for hexadecimals
+      case 'b': // for binary
+        continue;
+      default:
+        is_number = false;
+        break;
+    }
   }
-
-  tokens[_count] = NULL;
-  *count = _count;
-  return tokens;
+  if (is_number) return LexNum;
+  return LexUnknownId;
 }
 
 lexer_t** LexStr(const char* buff, size_t* len)
 {
-  const char* delims = "{}[]()<>!@#$%^&*:;'-+/.,|";
   size_t TokensLen = 0;
   char** tokens = split_by_delims(buff, delims, &TokensLen);
+  lexer_t** ltokens = (lexer_t**) malloc(sizeof(lexer_t*) * TokensLen);
 
+  for (*len = 0; *len < TokensLen; *len = *len + 1)
+  {
+    ltokens[*len] = (lexer_t*)malloc(sizeof(lexerId_t));
 
+    if (get_lexer_id(tokens[*len]) == LexTok)
+    {
+      ltokens[*len]->word = NULL;
+      ltokens[*len]->id = LexTok;
+      ltokens[*len]->id_exact = get_lexer_idm(tokens[*len]);
+    }
+    else
+    {
+      ltokens[*len]->id = get_lexer_id(tokens[*len]);
+      // ...
+    }
+  }
 
   for (size_t i = 0; i < TokensLen; ++i) free(tokens[i]);
   free(tokens);
-  return (void*)0;
+  return ltokens;
 }
 
 void LexFree(lexer_t **lexer, size_t len)

@@ -2,13 +2,45 @@
 #include <stdlib.h>
 
 enum LexerId {
-  UnknownId,
+  LexUnknownId,
+  LexTok,
+  LexNum,
 };
 typedef enum LexerId lexerId_t;
+
+enum LexerIdM {
+  LexIdCurlyBracketOpen,
+  LexIdCurlyBracketClose,
+  LexIdSquareBracketOpen,
+  LexIdSquareBracketClose,
+  LexIdBracketOpen,
+  LexIdBracketClose,
+  LexIdLessThan,
+  LexIdGreaterThan,
+  LexIdExclamation,
+  LexIdAddSym,
+  LexIdHash,
+  LexIdDollar,
+  LexIdPercent,
+  LexIdPowHat,
+  LexIdAnd,
+  LexIdAsterisk,
+  LexIdColon,
+  LexIdSemiColon,
+  LexIdQuote,
+  LexIdMinus,
+  LexIdPlus,
+  LexIdSlash,
+  LexIdDot,
+  LexIdComma,
+  LexIdPipe,
+};
+typedef enum LexerIdM lexerIdm_t;
 
 struct Lexer {
   char* word;
   lexerId_t id;
+  lexerIdm_t id_exact;
 };
 typedef struct Lexer lexer_t;
 
