@@ -8,7 +8,7 @@
 static inline void SetFileLog(FILE* fp) { file_log = fp; }
 
 #define lerror(x, ...) \
-    fprintf(file_log, "\x1b[31m[ERR][%s(%d): int %s()] \x1b[0m" x "\n", __FILE__, __LINE__, __FUNCTION__, ##__VA_ARGS__)
+    fprintf(file_log, "\x1b[31m[ERR][%s(%d): %s] \x1b[0m" x "\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, ##__VA_ARGS__)
 
 #define linfo(x, ...) \
     fprintf(file_log, "\x1b[32m[INFO] \x1b[0m" x "\n", ##__VA_ARGS__)
